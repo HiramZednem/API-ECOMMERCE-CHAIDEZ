@@ -5,14 +5,18 @@ import com.escuelita.demo.controllers.dtos.requests.UpdateProductRequest;
 import com.escuelita.demo.controllers.dtos.responses.BaseResponse;
 import com.escuelita.demo.controllers.dtos.responses.GetProductResponse;
 import com.escuelita.demo.entities.Product;
+import com.escuelita.demo.entities.ProductType;
+import com.escuelita.demo.entities.projections.ProductProjection;
 import com.escuelita.demo.repositories.IProductRepository;
 import com.escuelita.demo.services.interfaces.IFileService;
 import com.escuelita.demo.services.interfaces.IProductService;
+import com.escuelita.demo.services.interfaces.IProductTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +28,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Autowired
     private IFileService fileService;
+
+    @Autowired
+    private IProductTypeService productTypeService;
 
     @Override
     public BaseResponse list() {
@@ -85,6 +92,9 @@ public class ProductServiceImpl implements IProductService {
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
         product.setCakePicture(request.getCakePicture());
+
+        ProductType productType = productTypeService.FindById(request.getProductTypeId());
+        product.setProductType(productType);
         return repository.save(product);
     }
 
@@ -96,6 +106,8 @@ public class ProductServiceImpl implements IProductService {
         response.setDescription(product.getDescription());
         response.setQuantity(product.getQuantity());
         response.setCakePicture(product.getCakePicture());
+
+        response.setProductResponse(product.getProductType().getType());
         return response;
     }
 
@@ -112,6 +124,10 @@ public class ProductServiceImpl implements IProductService {
         product.setDescription(request.getDescription());
         product.setQuantity(request.getQuantity());
         product.setCakePicture(request.getCakePicture());
+
+        ProductType productType = productTypeService.FindById(request.getProductTypeId());
+        product.setProductType(productType);
+
         return product;
     }
 
@@ -123,5 +139,39 @@ public class ProductServiceImpl implements IProductService {
                 .message("The Cake Photo uploaded correctly")
                 .success(Boolean.TRUE)
                 .httpStatus(HttpStatus.CREATED).build();
+    }
+
+    @Override
+    public BaseResponse getAllProductsByProductTypeId(Long id) {
+
+        List<ProductProjection> allProductsByProductTypeId = repository.getAllProductsByProductTypeId(id);
+
+        List<GetProductResponse> responses = new ArrayList<>();
+
+        for (int i=0; i<allProductsByProductTypeId.size();i++) {
+            responses.add(from(allProductsByProductTypeId.get(i)));
+        }
+
+
+        return BaseResponse.builder()
+                .data(responses)
+                .message("all products by product type")
+                .success(Boolean.TRUE)
+                .httpStatus(HttpStatus.OK).build();
+    }
+
+    private GetProductResponse from (ProductProjection request) {
+        GetProductResponse response = new GetProductResponse();
+        response.setId(request.getId());
+        response.setName(request.getName());
+        response.setPrice(request.getPrice());
+        response.setDescription(request.getDescription());
+        response.setQuantity(request.getQuantity());
+        response.setCakePicture(request.getCake_Picture());
+
+
+        ProductType productType = productTypeService.FindById(request.getProduct_type_id());
+        response.setProductResponse(productType.getType());
+        return response;
     }
 }

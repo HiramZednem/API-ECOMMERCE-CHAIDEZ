@@ -16,4 +16,6 @@ public class UpdateProductRequest {
     @Max(value = 600, message = "No hay mucho espacio para todos esos pasteles")
     private Integer quantity;
     private String cakePicture;
+
+    private Long productTypeId;
 }

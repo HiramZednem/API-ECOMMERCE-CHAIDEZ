@@ -23,4 +23,6 @@ public class CreateProductRequest {
     private Integer quantity;
 
     private String cakePicture;
+
+    private Long productTypeId;
 }

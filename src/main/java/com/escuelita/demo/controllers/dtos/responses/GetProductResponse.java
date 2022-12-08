@@ -13,4 +13,6 @@ public class GetProductResponse {
     private String description;
     private Integer quantity;
     private String cakePicture;
+
+    private String ProductResponse;
 }

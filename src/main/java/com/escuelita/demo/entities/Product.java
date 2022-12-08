@@ -35,4 +35,8 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<ProductOrder> productOrders;
 
+    @ManyToOne
+    @JoinColumn(name = "product_type_id")
+    private ProductType productType;
+
 }

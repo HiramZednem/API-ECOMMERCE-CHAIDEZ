@@ -14,4 +14,6 @@ public interface ProductProjection {
 
     String getCake_Picture();
 
+    Long getProduct_type_id();
+
 }
